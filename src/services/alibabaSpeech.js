@@ -13,27 +13,26 @@ const PHONETIC_MAP = {
     "Yeh capsule subah naashte se aadha ghanta pehle khaali pet paani ke saath lein."
 };
 
-let activeUtterance = null;
-
 export function stopAudio() {
   if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
     window.speechSynthesis.cancel();
+    window._currentUtterance = null;
   }
 }
 
 export function playAlibabaTTS(urduText, onStart, onEnd) {
-  if (!('speechSynthesis' in window)) {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
     alert("Speech synthesis is not supported on this browser.");
     onEnd?.();
     return;
   }
 
-  // 1. Force Reset Mobile Chrome Freeze
+  // 1. Complete reset of previous state
   window.speechSynthesis.cancel();
   window.speechSynthesis.resume();
 
   const cleanUrdu = (urduText || '').trim();
-  const voices = window.speechSynthesis.getVoices();
+  const voices = window.speechSynthesis.getVoices() || [];
   const subcontinentalVoice = voices.find(
     (v) =>
       v.lang.includes('ur') ||
@@ -47,39 +46,49 @@ export function playAlibabaTTS(urduText, onStart, onEnd) {
     ? cleanUrdu
     : (PHONETIC_MAP[cleanUrdu] || cleanUrdu);
 
-  // Store in outer reference to prevent Android Garbage Collection bug
-  activeUtterance = new SpeechSynthesisUtterance(spokenText);
-  activeUtterance.rate = 0.88;
-  activeUtterance.pitch = 1.0;
+  const utterance = new SpeechSynthesisUtterance(spokenText);
+  utterance.rate = 0.88;
+  utterance.pitch = 1.0;
 
   if (subcontinentalVoice) {
-    activeUtterance.voice = subcontinentalVoice;
-    activeUtterance.lang = subcontinentalVoice.lang;
+    utterance.voice = subcontinentalVoice;
+    utterance.lang = subcontinentalVoice.lang;
   } else {
-    activeUtterance.lang = 'hi-IN';
+    utterance.lang = 'hi-IN';
   }
 
-  // 2. Failsafe Safety Timeout for Mobile Android Chrome
-  let safetyTimeout = setTimeout(() => {
-    onEnd?.();
-  }, 9000);
+  // 2. Global attachment prevents Android garbage collection freeze
+  window._currentUtterance = utterance;
 
-  activeUtterance.onstart = () => {
+  let hasEnded = false;
+  const finishCallback = () => {
+    if (!hasEnded) {
+      hasEnded = true;
+      window._currentUtterance = null;
+      onEnd?.();
+    }
+  };
+
+  utterance.onstart = () => {
     onStart?.();
   };
 
-  activeUtterance.onend = () => {
-    clearTimeout(safetyTimeout);
-    onEnd?.();
-  };
+  utterance.onend = finishCallback;
+  utterance.onerror = finishCallback;
 
-  activeUtterance.onerror = () => {
-    clearTimeout(safetyTimeout);
-    onEnd?.();
-  };
+  // 3. Fallback timer if mobile drops end event
+  setTimeout(finishCallback, 7000);
 
-  // 3. Trigger Play
-  window.speechSynthesis.speak(activeUtterance);
+  // 4. Critical mobile fix: 60ms delay after cancel before speaking
+  setTimeout(() => {
+    try {
+      window.speechSynthesis.resume();
+      window.speechSynthesis.speak(utterance);
+    } catch (err) {
+      console.error("Speech trigger error:", err);
+      finishCallback();
+    }
+  }, 60);
 }
 
 export function startVoiceRecognition(onResult, onError) {
