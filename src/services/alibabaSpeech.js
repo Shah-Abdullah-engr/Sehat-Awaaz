@@ -1,6 +1,5 @@
 // src/services/alibabaSpeech.js
 
-// Roman Urdu mapping taake accent bilkul natural aur saaf aye
 const PHONETIC_MAP = {
   "یہ گولی صبح اور شام کھانا کھانے کے بعد لیں، کورس پورا کریں":
     "Yeh goli subah aur shaam khaana khaane ke baad lein. Course poora karein.",
@@ -14,34 +13,27 @@ const PHONETIC_MAP = {
     "Yeh capsule subah naashte se aadha ghanta pehle khaali pet paani ke saath lein."
 };
 
-let cachedVoices = [];
+let activeUtterance = null;
 
-// Chrome voice engine initialization
-function getAvailableVoices() {
-  if (cachedVoices.length > 0) return cachedVoices;
-  cachedVoices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
-  return cachedVoices;
-}
-
-if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-  window.speechSynthesis.onvoiceschanged = () => {
-    cachedVoices = window.speechSynthesis.getVoices();
-  };
+export function stopAudio() {
+  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
 }
 
 export function playAlibabaTTS(urduText, onStart, onEnd) {
   if (!('speechSynthesis' in window)) {
-    alert("Speech Synthesis browser mein support nahi hai.");
+    alert("Speech synthesis is not supported on this browser.");
     onEnd?.();
     return;
   }
 
-  // 1. Chrome freeze fix
+  // 1. Force Reset Mobile Chrome Freeze
   window.speechSynthesis.cancel();
   window.speechSynthesis.resume();
 
-  // 2. Select authentic accent voice (Urdu / Hindi / Indian English)
-  const voices = getAvailableVoices();
+  const cleanUrdu = (urduText || '').trim();
+  const voices = window.speechSynthesis.getVoices();
   const subcontinentalVoice = voices.find(
     (v) =>
       v.lang.includes('ur') ||
@@ -51,46 +43,48 @@ export function playAlibabaTTS(urduText, onStart, onEnd) {
       v.name.includes('Hindi')
   );
 
-  // 3. Prepare phonetic text
-  const cleanUrdu = urduText.trim();
   const spokenText = subcontinentalVoice && subcontinentalVoice.lang.includes('ur')
     ? cleanUrdu
     : (PHONETIC_MAP[cleanUrdu] || cleanUrdu);
 
-  const utterance = new SpeechSynthesisUtterance(spokenText);
-  utterance.rate = 0.88; // Natural speaking tempo
-  utterance.pitch = 1.0;
+  // Store in outer reference to prevent Android Garbage Collection bug
+  activeUtterance = new SpeechSynthesisUtterance(spokenText);
+  activeUtterance.rate = 0.88;
+  activeUtterance.pitch = 1.0;
 
   if (subcontinentalVoice) {
-    utterance.voice = subcontinentalVoice;
-    utterance.lang = subcontinentalVoice.lang;
+    activeUtterance.voice = subcontinentalVoice;
+    activeUtterance.lang = subcontinentalVoice.lang;
   } else {
-    utterance.lang = 'hi-IN'; // Fallback to South Asian phonetic engine
+    activeUtterance.lang = 'hi-IN';
   }
 
-  // 4. Lifecycle Listeners
-  utterance.onstart = () => {
+  // 2. Failsafe Safety Timeout for Mobile Android Chrome
+  let safetyTimeout = setTimeout(() => {
+    onEnd?.();
+  }, 9000);
+
+  activeUtterance.onstart = () => {
     onStart?.();
   };
 
-  utterance.onend = () => {
+  activeUtterance.onend = () => {
+    clearTimeout(safetyTimeout);
     onEnd?.();
   };
 
-  utterance.onerror = (e) => {
-    console.error("TTS Playback Error:", e);
+  activeUtterance.onerror = () => {
+    clearTimeout(safetyTimeout);
     onEnd?.();
   };
 
-  // 5. Play Audio
-  window.speechSynthesis.speak(utterance);
+  // 3. Trigger Play
+  window.speechSynthesis.speak(activeUtterance);
 }
 
 export function startVoiceRecognition(onResult, onError) {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
   if (!SpeechRecognition) {
-    alert("Google Chrome use karein microphone voice input ke liye.");
     onError?.("Not Supported");
     return;
   }
@@ -98,17 +92,8 @@ export function startVoiceRecognition(onResult, onError) {
   const recognition = new SpeechRecognition();
   recognition.lang = "en-US";
   recognition.interimResults = false;
-  recognition.maxAlternatives = 1;
 
-  recognition.onresult = (event) => {
-    const transcript = event.results[0][0].transcript;
-    onResult(transcript);
-  };
-
-  recognition.onerror = (err) => {
-    console.error("Mic Error:", err);
-    onError?.(err);
-  };
-
+  recognition.onresult = (event) => onResult(event.results[0][0].transcript);
+  recognition.onerror = (err) => onError?.(err);
   recognition.start();
 }

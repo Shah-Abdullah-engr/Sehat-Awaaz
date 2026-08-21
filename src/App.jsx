@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import QRCode from 'qrcode';
 import { AI_DRUG_DATABASE } from './data/medicinedatabase';
-import { playAlibabaTTS, startVoiceRecognition } from './services/alibabaSpeech';
+import { playAlibabaTTS, stopAudio, startVoiceRecognition } from './services/alibabaSpeech';
 
 import Navbar from './components/navbar';
 import PresetsPanel from './components/presetpanel';
@@ -11,16 +11,14 @@ import StickerPreview from './components/stickerpreview';
 import './App.css';
 
 export default function App() {
-  // 1. Check if opened via QR Scan on Mobile
   const urlParams = new URLSearchParams(window.location.search);
   const scanMedKey = (urlParams.get('med') || '').toLowerCase().trim();
   const isPatientView = Boolean(scanMedKey);
 
-  // Get data for scanned medicine from local database
   const scannedData = AI_DRUG_DATABASE[scanMedKey] || {
-    name: urlParams.get('med') || 'Medicine',
-    dosage: '1 Tablet twice daily after meals',
-    urduPrompt: 'یہ دوا ڈاکٹر کی ہدایت کے مطابق استعمال کریں۔',
+    name: urlParams.get('med') || 'Prescribed Medicine',
+    dosage: '1 Tablet every 12 Hours (Twice Daily) for 5 Days',
+    urduPrompt: 'یہ گولی صبح اور شام کھانا کھانے کے بعد لیں، کورس پورا کریں',
     schedule: { morning: true, night: true }
   };
 
@@ -33,7 +31,6 @@ export default function App() {
   const [isListening, setIsListening] = useState(false);
   const qrCanvasRef = useRef(null);
 
-  // Sync state when Preset clicked
   const handlePresetSelect = (presetName) => {
     setSelectedPreset(presetName);
     const key = presetName.toLowerCase();
@@ -48,7 +45,6 @@ export default function App() {
     }
   };
 
-  // Sync Search
   useEffect(() => {
     const key = searchTerm.toLowerCase().trim();
     if (AI_DRUG_DATABASE[key]) {
@@ -59,11 +55,9 @@ export default function App() {
     }
   }, [searchTerm]);
 
-  // Clean, Short Web Link for QR Code
   useEffect(() => {
     if (qrCanvasRef.current && !isPatientView) {
       const baseUrl = window.location.origin;
-      // Ultra-clean short URL: http://192.168.0.9:5173/?med=augmentin+625mg
       const cleanUrl = `${baseUrl}/?med=${encodeURIComponent(searchTerm.toLowerCase().trim())}`;
 
       QRCode.toCanvas(qrCanvasRef.current, cleanUrl, {
@@ -74,13 +68,18 @@ export default function App() {
     }
   }, [searchTerm, isPatientView]);
 
-  const handleVoiceListen = (textToPlay = urduPrompt) => {
-    setIsPlayingAudio(true);
-    playAlibabaTTS(
-      textToPlay,
-      () => setIsPlayingAudio(true),
-      () => setIsPlayingAudio(false)
-    );
+  const toggleAudio = (textToPlay) => {
+    if (isPlayingAudio) {
+      stopAudio();
+      setIsPlayingAudio(false);
+    } else {
+      setIsPlayingAudio(true);
+      playAlibabaTTS(
+        textToPlay,
+        () => setIsPlayingAudio(true),
+        () => setIsPlayingAudio(false)
+      );
+    }
   };
 
   const handleVoiceSearch = () => {
@@ -99,33 +98,57 @@ export default function App() {
   // -------------------------------------------------------------
   if (isPatientView) {
     return (
-      <div className="patient-screen">
+      <div className="patient-mobile-wrapper">
         <div className="patient-card">
-          <div className="patient-header">
-            <span className="badge">صحت آواز • آڈیو رہنمائی</span>
-            <h2>{scannedData.name}</h2>
-            <p className="patient-dose">{scannedData.dosage}</p>
+          <div className="patient-badge">
+            <span className="pulse-dot"></span>
+            SEHAT AWAAZ • آڈیو رہنمائی
+          </div>
+
+          <h1 className="patient-med-name">{scannedData.name}</h1>
+          <div className="patient-dose-badge">{scannedData.dosage}</div>
+
+          <div className="patient-schedule-chips">
+            <span className={`chip ${scannedData.schedule?.morning ? 'active' : ''}`}>
+              ☀️ صبح (Morning)
+            </span>
+            <span className={`chip ${scannedData.schedule?.night ? 'active' : ''}`}>
+              🌙 رات (Night)
+            </span>
           </div>
 
           <div className="patient-urdu-box">
-            <p>{scannedData.urduPrompt}</p>
+            <p className="patient-urdu-text">{scannedData.urduPrompt}</p>
           </div>
 
+          {/* Sound Wave Animation */}
+          {isPlayingAudio && (
+            <div className="sound-wave">
+              <span className="bar"></span>
+              <span className="bar"></span>
+              <span className="bar"></span>
+              <span className="bar"></span>
+              <span className="bar"></span>
+            </div>
+          )}
+
           <button
-            className={`patient-play-btn ${isPlayingAudio ? 'pulse' : ''}`}
-            onClick={() => handleVoiceListen(scannedData.urduPrompt)}
+            className={`patient-play-btn ${isPlayingAudio ? 'playing' : ''}`}
+            onClick={() => toggleAudio(scannedData.urduPrompt)}
           >
-            {isPlayingAudio ? '🔊 آواز چل رہی ہے...' : '▶️ ہدایات سنیں (Play Audio)'}
+            {isPlayingAudio ? '⏹️ آواز بند کریں (Stop)' : '🔊 ہدایات سنیں (Play Audio)'}
           </button>
 
-          <p className="patient-footer">ڈاکٹر یا فارماسسٹ کی دی گئی ہدایات کے مطابق دوا استعمال کریں۔</p>
+          <footer className="patient-footer-note">
+            ⚠️ برائے مہربانی دوا اپنے معالج کی ہدایات کے مطابق استعمال کریں۔
+          </footer>
         </div>
       </div>
     );
   }
 
   // -------------------------------------------------------------
-  // PHARMACIST DASHBOARD (Default View)
+  // PHARMACIST DESKTOP DASHBOARD
   // -------------------------------------------------------------
   return (
     <div className="app-wrapper">
@@ -146,7 +169,7 @@ export default function App() {
           setUrduPrompt={setUrduPrompt}
           timing={timing}
           setTiming={setTiming}
-          onVoiceListen={() => handleVoiceListen(urduPrompt)}
+          onVoiceListen={() => toggleAudio(urduPrompt)}
           isPlayingAudio={isPlayingAudio}
           onVoiceSearch={handleVoiceSearch}
           isListening={isListening}

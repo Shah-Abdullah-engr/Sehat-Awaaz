@@ -30,7 +30,7 @@ body {
   padding: 24px;
 }
 
-/* Top Navbar */
+/* Navbar */
 .top-nav {
   display: flex;
   justify-content: space-between;
@@ -88,7 +88,7 @@ body {
   border: none;
 }
 
-/* 3-Column Grid */
+/* Dashboard Grid */
 .dashboard-grid {
   display: grid;
   grid-template-columns: 290px 1.4fr 340px;
@@ -96,7 +96,6 @@ body {
   align-items: stretch;
 }
 
-/* Glass Cards */
 .glass-card {
   background: var(--glass-bg);
   backdrop-filter: blur(16px);
@@ -115,7 +114,6 @@ body {
   letter-spacing: 0.3px;
 }
 
-/* Left Column */
 .col-left {
   display: flex;
   flex-direction: column;
@@ -188,7 +186,6 @@ body {
   color: #0f172a;
 }
 
-/* Center Column */
 .col-center {
   display: flex;
   flex-direction: column;
@@ -275,7 +272,6 @@ body {
   background: #dbeafe;
 }
 
-/* Urdu Audio Card */
 .urdu-prompt-card {
   background: rgba(255, 255, 255, 0.9);
   border: 1.5px solid #38bdf8;
@@ -316,7 +312,6 @@ body {
   cursor: pointer;
 }
 
-/* Workflow Pipeline */
 .workflow-pipeline {
   display: flex;
   align-items: center;
@@ -345,7 +340,6 @@ body {
   font-size: 1.1rem;
 }
 
-/* Right Column & Thermal Sticker */
 .col-right {
   display: flex;
   flex-direction: column;
@@ -422,21 +416,174 @@ body {
   transform: translateY(-1px);
 }
 
-/* Print Rules */
+/* ======================================================== */
+/* PATIENT MOBILE APP SCREEN (MODERN CLEAN DESIGN)           */
+/* ======================================================== */
+.patient-mobile-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: radial-gradient(circle at 50% 10%, #dbeafe 0%, #bfdbfe 100%);
+}
+
+.patient-card {
+  width: 100%;
+  max-width: 440px;
+  background: #ffffff;
+  border-radius: 28px;
+  padding: 28px 22px;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(30, 58, 138, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.patient-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #e0f2fe;
+  color: #0369a1;
+  padding: 6px 16px;
+  border-radius: 30px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  background: #0284c7;
+  border-radius: 50%;
+  box-shadow: 0 0 0 rgba(2, 132, 199, 0.7);
+  animation: pulse-ring 1.6s infinite;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(2, 132, 199, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(2, 132, 199, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(2, 132, 199, 0); }
+}
+
+.patient-med-name {
+  margin: 18px 0 6px 0;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.patient-dose-badge {
+  color: #475569;
+  font-size: 0.95rem;
+  font-weight: 600;
+  background: #f1f5f9;
+  padding: 8px 14px;
+  border-radius: 12px;
+  display: inline-block;
+  margin-bottom: 14px;
+}
+
+.patient-schedule-chips {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.patient-schedule-chips .chip {
+  padding: 6px 14px;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  background: #f8fafc;
+  color: #94a3b8;
+  border: 1px solid #e2e8f0;
+}
+
+.patient-schedule-chips .chip.active {
+  background: #e0f2fe;
+  color: #0369a1;
+  border-color: #7dd3fc;
+}
+
+.patient-urdu-box {
+  background: #f8fafc;
+  border: 2px solid #38bdf8;
+  border-radius: 20px;
+  padding: 22px 18px;
+  margin-bottom: 20px;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.02);
+}
+
+.patient-urdu-text {
+  font-family: 'Noto Nastaliq Urdu', serif;
+  direction: rtl;
+  font-size: 1.4rem;
+  line-height: 2.3;
+  margin: 0;
+  color: #0f172a;
+}
+
+/* Sound Wave Bars */
+.sound-wave {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  margin-bottom: 16px;
+}
+
+.sound-wave .bar {
+  width: 4px;
+  height: 10px;
+  background: #2563eb;
+  border-radius: 4px;
+  animation: wave 1s infinite ease-in-out;
+}
+
+.sound-wave .bar:nth-child(2) { animation-delay: 0.2s; }
+.sound-wave .bar:nth-child(3) { animation-delay: 0.4s; }
+.sound-wave .bar:nth-child(4) { animation-delay: 0.1s; }
+.sound-wave .bar:nth-child(5) { animation-delay: 0.3s; }
+
+@keyframes wave {
+  0%, 100% { height: 8px; }
+  50% { height: 26px; }
+}
+
+.patient-play-btn {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #0284c7, #2563eb);
+  color: #ffffff;
+  border: none;
+  border-radius: 16px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
+  transition: all 0.2s ease;
+}
+
+.patient-play-btn.playing {
+  background: #ef4444;
+  box-shadow: 0 8px 24px rgba(239, 68, 68, 0.3);
+}
+
+.patient-footer-note {
+  margin-top: 18px;
+  font-size: 0.76rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+/* Print CSS */
 @media print {
-  body {
-    background: #ffffff;
-  }
-  .no-print {
-    display: none !important;
-  }
-  .dashboard-grid {
-    display: block;
-  }
-  .thermal-paper {
-    clip-path: none;
-    box-shadow: none;
-    padding: 0;
-    width: 2.25in;
-  }
+  body { background: #ffffff; }
+  .no-print { display: none !important; }
+  .dashboard-grid { display: block; }
+  .thermal-paper { clip-path: none; box-shadow: none; padding: 0; width: 2.25in; }
 }
