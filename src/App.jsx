@@ -1,7 +1,7 @@
 // src/App.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import QRCode from 'qrcode';
-import { AI_DRUG_DATABASE } from './data/medicineDatabase';
+import { AI_DRUG_DATABASE } from './data/medicinedatabase';
 import { playAlibabaTTS, startVoiceRecognition } from './services/alibabaSpeech';
 
 import Navbar from './components/navbar';
