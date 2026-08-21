@@ -13,10 +13,13 @@ const PHONETIC_MAP = {
     "Yeh capsule subah naashte se aadha ghanta pehle khaali pet paani ke saath lein."
 };
 
+// Global array keeps speech objects in memory so Android doesn't destroy them
+window._activeUtterances = [];
+
 export function stopAudio() {
   if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
     window.speechSynthesis.cancel();
-    window._currentUtterance = null;
+    window._activeUtterances = [];
   }
 }
 
@@ -27,7 +30,7 @@ export function playAlibabaTTS(urduText, onStart, onEnd) {
     return;
   }
 
-  // 1. Complete reset of previous state
+  // 1. Instant Synchronous Reset
   window.speechSynthesis.cancel();
   window.speechSynthesis.resume();
 
@@ -57,14 +60,14 @@ export function playAlibabaTTS(urduText, onStart, onEnd) {
     utterance.lang = 'hi-IN';
   }
 
-  // 2. Global attachment prevents Android garbage collection freeze
-  window._currentUtterance = utterance;
+  // Prevent Mobile Chrome Garbage Collection
+  window._activeUtterances.push(utterance);
 
-  let hasEnded = false;
-  const finishCallback = () => {
-    if (!hasEnded) {
-      hasEnded = true;
-      window._currentUtterance = null;
+  let finished = false;
+  const cleanup = () => {
+    if (!finished) {
+      finished = true;
+      window._activeUtterances = window._activeUtterances.filter(u => u !== utterance);
       onEnd?.();
     }
   };
@@ -73,22 +76,32 @@ export function playAlibabaTTS(urduText, onStart, onEnd) {
     onStart?.();
   };
 
-  utterance.onend = finishCallback;
-  utterance.onerror = finishCallback;
+  utterance.onend = () => {
+    cleanup();
+  };
 
-  // 3. Fallback timer if mobile drops end event
-  setTimeout(finishCallback, 7000);
+  utterance.onerror = () => {
+    cleanup();
+  };
 
-  // 4. Critical mobile fix: 60ms delay after cancel before speaking
-  setTimeout(() => {
-    try {
+  // 2. Android Watchdog (Keeps background engine active)
+  const watchdog = setInterval(() => {
+    if (!window.speechSynthesis.speaking) {
+      clearInterval(watchdog);
+      cleanup();
+    } else {
       window.speechSynthesis.resume();
-      window.speechSynthesis.speak(utterance);
-    } catch (err) {
-      console.error("Speech trigger error:", err);
-      finishCallback();
     }
-  }, 60);
+  }, 400);
+
+  // Safety cutoff
+  setTimeout(() => {
+    clearInterval(watchdog);
+    cleanup();
+  }, 8000);
+
+  // 3. SYNCHRONOUS TRIGGER (Required for Mobile gesture authorization)
+  window.speechSynthesis.speak(utterance);
 }
 
 export function startVoiceRecognition(onResult, onError) {
