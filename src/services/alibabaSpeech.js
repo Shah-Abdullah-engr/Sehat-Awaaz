@@ -13,7 +13,6 @@ const PHONETIC_MAP = {
     "Yeh capsule subah naashte se aadha ghanta pehle khaali pet paani ke saath lein."
 };
 
-// Global array keeps speech objects in memory so Android doesn't destroy them
 window._activeUtterances = [];
 
 export function stopAudio() {
@@ -23,45 +22,49 @@ export function stopAudio() {
   }
 }
 
-export function playAlibabaTTS(urduText, onStart, onEnd) {
+export function playAlibabaTTS(text, onStart, onEnd) {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
-    alert("Speech synthesis is not supported on this browser.");
     onEnd?.();
     return;
   }
 
-  // 1. Instant Synchronous Reset
+  // Purana audio cancel karo
   window.speechSynthesis.cancel();
   window.speechSynthesis.resume();
 
-  const cleanUrdu = (urduText || '').trim();
-  const voices = window.speechSynthesis.getVoices() || [];
-  const subcontinentalVoice = voices.find(
-    (v) =>
-      v.lang.includes('ur') ||
-      v.lang.includes('hi') ||
-      v.name.includes('India') ||
-      v.name.includes('Urdu') ||
-      v.name.includes('Hindi')
-  );
+  const cleanText = (text || '').trim();
+  if (!cleanText) {
+    onEnd?.();
+    return;
+  }
 
-  const spokenText = subcontinentalVoice && subcontinentalVoice.lang.includes('ur')
-    ? cleanUrdu
-    : (PHONETIC_MAP[cleanUrdu] || cleanUrdu);
+  // Agar Urdu aayi ho toh Roman map uthao, warna cleanText hi Roman Urdu hai
+  const spokenText = PHONETIC_MAP[cleanText] || cleanText;
 
   const utterance = new SpeechSynthesisUtterance(spokenText);
   utterance.rate = 0.88;
   utterance.pitch = 1.0;
+  utterance.lang = 'hi-IN'; // Desi subcontinental female accent
 
-  if (subcontinentalVoice) {
-    utterance.voice = subcontinentalVoice;
-    utterance.lang = subcontinentalVoice.lang;
-  } else {
-    utterance.lang = 'hi-IN';
+  const voices = window.speechSynthesis.getVoices() || [];
+  
+  // Best female voice selector (Google Hindi on Android, Microsoft Swara on Edge)
+  const bestFemaleVoice = voices.find(v => 
+    v.name.includes('Google हिन्दी') || 
+    v.name.includes('Swara') || 
+    v.name.includes('Heera') || 
+    v.name.includes('Gul')
+  ) || voices.find(v => 
+    (v.lang.includes('hi') || v.lang.includes('ur') || v.lang.includes('IN')) && 
+    !v.name.toLowerCase().includes('male') && 
+    !v.name.toLowerCase().includes('david') && 
+    !v.name.toLowerCase().includes('mark')
+  );
+
+  if (bestFemaleVoice) {
+    utterance.voice = bestFemaleVoice;
+    utterance.lang = bestFemaleVoice.lang;
   }
-
-  // Prevent Mobile Chrome Garbage Collection
-  window._activeUtterances.push(utterance);
 
   let finished = false;
   const cleanup = () => {
@@ -72,35 +75,11 @@ export function playAlibabaTTS(urduText, onStart, onEnd) {
     }
   };
 
-  utterance.onstart = () => {
-    onStart?.();
-  };
+  utterance.onstart = () => onStart?.();
+  utterance.onend = () => cleanup();
+  utterance.onerror = () => cleanup();
 
-  utterance.onend = () => {
-    cleanup();
-  };
-
-  utterance.onerror = () => {
-    cleanup();
-  };
-
-  // 2. Android Watchdog (Keeps background engine active)
-  const watchdog = setInterval(() => {
-    if (!window.speechSynthesis.speaking) {
-      clearInterval(watchdog);
-      cleanup();
-    } else {
-      window.speechSynthesis.resume();
-    }
-  }, 400);
-
-  // Safety cutoff
-  setTimeout(() => {
-    clearInterval(watchdog);
-    cleanup();
-  }, 8000);
-
-  // 3. SYNCHRONOUS TRIGGER (Required for Mobile gesture authorization)
+  window._activeUtterances.push(utterance);
   window.speechSynthesis.speak(utterance);
 }
 
@@ -110,11 +89,9 @@ export function startVoiceRecognition(onResult, onError) {
     onError?.("Not Supported");
     return;
   }
-
   const recognition = new SpeechRecognition();
   recognition.lang = "en-US";
   recognition.interimResults = false;
-
   recognition.onresult = (event) => onResult(event.results[0][0].transcript);
   recognition.onerror = (err) => onError?.(err);
   recognition.start();

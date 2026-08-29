@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 export default function PrescriptionStudio({
   searchTerm,
   setSearchTerm,
   dosage,
   setDosage,
+  purpose, // 👈 Naya Prop
   urduPrompt,
   setUrduPrompt,
   timing,
@@ -14,6 +15,8 @@ export default function PrescriptionStudio({
   onVoiceSearch,
   isListening
 }) {
+  const [showDropdown, setShowDropdown] = useState(false);
+
   return (
     <section className="col-center glass-card no-print">
       <h3 className="card-title">AI PRESCRIPTION STUDIO</h3>
@@ -24,13 +27,50 @@ export default function PrescriptionStudio({
           <circle cx="11" cy="11" r="8"></circle>
           <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
-        <input
-          type="text"
-          className="search-input"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Augmentin 625mg"
-        />
+        
+        <div className="sehat-dropdown-container">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setShowDropdown(true);
+            }}
+            onClick={() => setShowDropdown(true)} // 👈 DROPDOWN CLICK FIX! Ab hamesha click pe khulega
+            onFocus={() => setShowDropdown(true)}
+            onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+            placeholder="Search Medicine (e.g. Panadol)"
+            className="w-full text-lg p-3 px-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+          />
+
+          {/* Clean Dropdown */}
+          {showDropdown && (
+            <ul className="sehat-dropdown-list" style={{ zIndex: 999 }}>
+              {[
+                "Panadol 500mg", "Panadol Extra", "Brufen 400mg", "Augmentin 625mg",
+                "Risek 40mg", "Flagyl 400mg", "Novidat 500mg", "Calamox 625mg",
+                "Ponstan Forte", "Arinac", "Rigix 10mg", "Softin", "Gaviscon Syrup",
+                "Ciproxin 500mg", "Amoxil 500mg", "Disprin 300mg", "Glucophage 500mg",
+                "Gravinate", "Surbex Z", "Evion 400mg", "Synflex", "Calpol Syrup"
+              ]
+                .filter((med) => med.toLowerCase().includes(searchTerm.toLowerCase()))
+                .map((med, index) => (
+                  <li
+                    key={index}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      setSearchTerm(med);
+                      setShowDropdown(false);
+                    }}
+                    className="sehat-dropdown-item"
+                  >
+                    {med}
+                  </li>
+                ))}
+            </ul>
+          )}
+        </div> 
+
         <button 
           className={`search-arrow-btn ${isListening ? 'listening' : ''}`} 
           onClick={onVoiceSearch} 
@@ -38,6 +78,18 @@ export default function PrescriptionStudio({
         >
           {isListening ? '🎙️' : '➔'}
         </button>
+      </div>
+
+      {/* 🚨 NAYA HISSA: Medicine Purpose Box */}
+      <div className="form-group" style={{ marginTop: '10px' }}>
+        <label className="section-label">Medicine Purpose (یہ دوا کس لیے ہے؟)</label>
+        <input
+          type="text"
+          className="glass-input"
+          value={purpose || 'Fetching purpose...'}
+          readOnly
+          style={{ backgroundColor: '#f8fafc', color: '#0f172a', fontWeight: '500' }}
+        />
       </div>
 
       {/* Suggested Dosage */}
@@ -70,7 +122,7 @@ export default function PrescriptionStudio({
         </div>
       </div>
 
-      {/* Urdu Audio Script Box */}
+      {/* Urdu Audio Script Box (Pehle jesa hi hai) */}
       <div className="form-group">
         <label className="section-label">Urdu Audio Prompt Preview</label>
         <div className="urdu-prompt-card">
@@ -88,23 +140,6 @@ export default function PrescriptionStudio({
         </div>
       </div>
 
-      {/* Workflow Indicator */}
-      <div className="workflow-pipeline">
-        <div className="pipeline-step">
-          <span className="pipe-icon">🤖</span>
-          <span>AI Diagnosis</span>
-        </div>
-        <span className="pipe-arrow">➔</span>
-        <div className="pipeline-step">
-          <span className="pipe-icon">👤</span>
-          <span>Human Validation</span>
-        </div>
-        <span className="pipe-arrow">➔</span>
-        <div className="pipeline-step">
-          <span className="pipe-icon">📝</span>
-          <span>Label Generation</span>
-        </div>
-      </div>
     </section>
   );
 }

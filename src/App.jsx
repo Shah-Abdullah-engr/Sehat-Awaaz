@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import QRCode from 'qrcode';
 import { AI_DRUG_DATABASE } from './data/medicinedatabase';
 import { playAlibabaTTS, stopAudio, startVoiceRecognition } from './services/alibabaSpeech';
+import { fetchMedicineFromAI } from './services/aimedicineservices';
 
 import Navbar from './components/navbar';
 import PresetsPanel from './components/presetpanel';
@@ -15,50 +16,112 @@ export default function App() {
   const scanMedKey = (urlParams.get('med') || '').toLowerCase().trim();
   const isPatientView = Boolean(scanMedKey);
 
-  const scannedData = AI_DRUG_DATABASE[scanMedKey] || {
-    name: urlParams.get('med') || 'Prescribed Medicine',
-    dosage: '1 Tablet every 12 Hours (Twice Daily) for 5 Days',
-    urduPrompt: 'یہ گولی صبح اور شام کھانا کھانے کے بعد لیں، کورس پورا کریں',
-    schedule: { morning: true, night: true }
-  };
-
   const [selectedPreset, setSelectedPreset] = useState('Augmentin 1g');
   const [searchTerm, setSearchTerm] = useState('Augmentin 625mg');
   const [dosage, setDosage] = useState('1 Tablet every 12 Hours (Twice Daily) for 5 Days');
+  const [purpose, setPurpose] = useState('Pain and Fever Relief');
   const [urduPrompt, setUrduPrompt] = useState('یہ گولی صبح اور شام کھانا کھانے کے بعد لیں، کورس پورا کریں');
+  const [phoneticPrompt, setPhoneticPrompt] = useState('Yeh goli subah aur shaam khaana khaane ke baad lein. Course poora karein.');
   const [timing, setTiming] = useState({ morning: true, night: true });
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const qrCanvasRef = useRef(null);
 
+  const [scannedData, setScannedData] = useState(() => {
+    if (AI_DRUG_DATABASE[scanMedKey]) return AI_DRUG_DATABASE[scanMedKey];
+    return {
+      name: urlParams.get('med') || 'Prescribed Medicine',
+      dosage: 'AI Data Load ho raha hai...',
+      urduPrompt: 'ہدایات لوڈ ہو رہی ہیں...',
+      phoneticPrompt: 'Hidayat load ho rahi hain...',
+      schedule: { morning: true, night: true }
+    };
+  });
+
+  // Patient Mobile View
+  useEffect(() => {
+    if (isPatientView && scanMedKey && !AI_DRUG_DATABASE[scanMedKey]) {
+      const getPatientAI = async () => {
+        const aiResult = await fetchMedicineFromAI(scanMedKey);
+        if (aiResult) {
+          setScannedData({
+            name: urlParams.get('med'),
+            dosage: aiResult.dosage,
+            urduPrompt: aiResult.urduPrompt,
+            phoneticPrompt: aiResult.phoneticPrompt || aiResult.urduPrompt,
+            schedule: aiResult.timing
+          });
+        }
+      };
+      getPatientAI();
+    }
+  }, [isPatientView, scanMedKey]);
+
+  // Presets select
   const handlePresetSelect = (presetName) => {
     setSelectedPreset(presetName);
     const key = presetName.toLowerCase();
+    
     if (AI_DRUG_DATABASE[key]) {
       const entry = AI_DRUG_DATABASE[key];
       setSearchTerm(entry.name);
       setDosage(entry.dosage);
       setUrduPrompt(entry.urduPrompt);
+      setPhoneticPrompt(entry.phoneticPrompt || entry.urduPrompt);
       setTiming(entry.schedule);
     } else {
       setSearchTerm(presetName);
     }
   };
 
+  // Nayi Dawai Search Logic
   useEffect(() => {
     const key = searchTerm.toLowerCase().trim();
+    if (!key) return;
+
     if (AI_DRUG_DATABASE[key]) {
       const entry = AI_DRUG_DATABASE[key];
       setDosage(entry.dosage);
+      setPurpose(entry.purpose || "General Purpose");
       setUrduPrompt(entry.urduPrompt);
+      setPhoneticPrompt(entry.phoneticPrompt || entry.urduPrompt);
       setTiming(entry.schedule);
+      return;
     }
+
+    const fetchFromAI = async () => {
+      setDosage("Generating smart dosage...");
+      setPurpose("AI is checking purpose...");
+      setUrduPrompt("AI ہدایات لکھ رہا ہے...");
+
+      const aiResult = await fetchMedicineFromAI(searchTerm);
+      
+      if (aiResult) {
+        setDosage(aiResult.dosage);
+        setPurpose(aiResult.purpose);
+        setUrduPrompt(aiResult.urduPrompt);
+        setPhoneticPrompt(aiResult.phoneticPrompt || aiResult.urduPrompt);
+        setTiming(aiResult.timing);
+      } else {
+        setDosage("Please enter dosage manually");
+        setPurpose("Not Found");
+        setUrduPrompt("براہ کرم ہدایات خود درج کریں۔");
+        setPhoneticPrompt("Barae meherbani hidayat khud darj karein.");
+      }
+    };
+
+    const timeoutId = setTimeout(() => {
+      fetchFromAI();
+    }, 1200);
+
+    return () => clearTimeout(timeoutId);
   }, [searchTerm]);
 
+  // QR Code
   useEffect(() => {
     if (qrCanvasRef.current && !isPatientView) {
       const baseUrl = window.location.origin;
-      const cleanUrl = `${baseUrl}/?med=${encodeURIComponent(searchTerm.toLowerCase().trim())}`;
+      const cleanUrl = `${baseUrl}/?med=${encodeURIComponent(searchTerm.trim())}`;
 
       QRCode.toCanvas(qrCanvasRef.current, cleanUrl, {
         width: 140,
@@ -93,9 +156,6 @@ export default function App() {
     );
   };
 
-  // -------------------------------------------------------------
-  // PATIENT MOBILE AUDIO PLAYER (Rendered on QR Scan)
-  // -------------------------------------------------------------
   if (isPatientView) {
     return (
       <div className="patient-mobile-wrapper">
@@ -109,32 +169,26 @@ export default function App() {
           <div className="patient-dose-badge">{scannedData.dosage}</div>
 
           <div className="patient-schedule-chips">
-            <span className={`chip ${scannedData.schedule?.morning ? 'active' : ''}`}>
-              ☀️ صبح (Morning)
-            </span>
-            <span className={`chip ${scannedData.schedule?.night ? 'active' : ''}`}>
-              🌙 رات (Night)
-            </span>
+            <span className={`chip ${scannedData.schedule?.morning ? 'active' : ''}`}>☀️ صبح (Morning)</span>
+            <span className={`chip ${scannedData.schedule?.noon ? 'active' : ''}`}>☀️ دوپہر (Noon)</span>
+            <span className={`chip ${scannedData.schedule?.night ? 'active' : ''}`}>🌙 رات (Night)</span>
           </div>
 
           <div className="patient-urdu-box">
             <p className="patient-urdu-text">{scannedData.urduPrompt}</p>
           </div>
 
-          {/* Sound Wave Animation */}
           {isPlayingAudio && (
             <div className="sound-wave">
-              <span className="bar"></span>
-              <span className="bar"></span>
-              <span className="bar"></span>
-              <span className="bar"></span>
+              <span className="bar"></span><span className="bar"></span>
+              <span className="bar"></span><span className="bar"></span>
               <span className="bar"></span>
             </div>
           )}
 
           <button
             className={`patient-play-btn ${isPlayingAudio ? 'playing' : ''}`}
-            onClick={() => toggleAudio(scannedData.urduPrompt)}
+            onClick={() => toggleAudio(scannedData.phoneticPrompt || scannedData.urduPrompt)}
           >
             {isPlayingAudio ? '⏹️ آواز بند کریں (Stop)' : '🔊 ہدایات سنیں (Play Audio)'}
           </button>
@@ -147,9 +201,6 @@ export default function App() {
     );
   }
 
-  // -------------------------------------------------------------
-  // PHARMACIST DESKTOP DASHBOARD
-  // -------------------------------------------------------------
   return (
     <div className="app-wrapper">
       <Navbar />
@@ -160,20 +211,22 @@ export default function App() {
           onSelectPreset={handlePresetSelect}
         />
 
-        <PrescriptionStudio
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          dosage={dosage}
-          setDosage={setDosage}
-          urduPrompt={urduPrompt}
-          setUrduPrompt={setUrduPrompt}
-          timing={timing}
-          setTiming={setTiming}
-          onVoiceListen={() => toggleAudio(urduPrompt)}
-          isPlayingAudio={isPlayingAudio}
-          onVoiceSearch={handleVoiceSearch}
-          isListening={isListening}
-        />
+       
+<PrescriptionStudio
+  searchTerm={searchTerm}
+  setSearchTerm={setSearchTerm}
+  dosage={dosage}
+  setDosage={setDosage}
+  purpose={purpose}
+  urduPrompt={urduPrompt}
+  setUrduPrompt={setUrduPrompt}
+  timing={timing}
+  setTiming={setTiming}
+  onVoiceListen={() => toggleAudio(phoneticPrompt)}
+  isPlayingAudio={isPlayingAudio}
+  onVoiceSearch={handleVoiceSearch}
+  isListening={isListening}
+/>
 
         <StickerPreview
           qrCanvasRef={qrCanvasRef}
