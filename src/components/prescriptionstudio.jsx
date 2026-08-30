@@ -18,7 +18,7 @@ export default function PrescriptionStudio({
   const dropdownRef = useRef(null);
   const safeTiming = timing || { morning: false, noon: false, night: false };
 
-  // Database keys for dropdown filter
+  // Dropdown filter
   const allMedicines = Object.keys(AI_DRUG_DATABASE || {});
   const filteredMedicines = allMedicines.filter((med) =>
     med.toLowerCase().includes(searchTerm.toLowerCase().trim())
@@ -42,6 +42,34 @@ export default function PrescriptionStudio({
 
   return (
     <section className="col-center" style={{ flex: 1 }}>
+      {/* Hover & Active Button Animations */}
+      <style>{`
+        .btn-listen-voice {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 0.55rem 1.15rem;
+          border-radius: 8px;
+          border: none;
+          background: #0284c7;
+          color: #ffffff;
+          font-weight: 600;
+          font-size: 0.88rem;
+          cursor: pointer;
+          box-shadow: 0 3px 8px rgba(2, 132, 199, 0.25);
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-listen-voice:hover {
+          background: #0369a1 !important;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 14px rgba(2, 132, 199, 0.4) !important;
+        }
+        .btn-listen-voice:active {
+          transform: translateY(0px) scale(0.98);
+          box-shadow: 0 2px 4px rgba(2, 132, 199, 0.2) !important;
+        }
+      `}</style>
+
       <div className="glass-card studio-card" style={{ padding: '1.5rem', borderRadius: '16px' }}>
         <h3 className="card-title" style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0f172a', marginBottom: '1.25rem', letterSpacing: '0.5px' }}>
           AI PRESCRIPTION STUDIO
@@ -100,7 +128,7 @@ export default function PrescriptionStudio({
             )}
           </div>
 
-          {/* Medicine Suggestions Dropdown Menu */}
+          {/* Dropdown Suggestions */}
           {showDropdown && filteredMedicines.length > 0 && (
             <ul
               style={{
@@ -295,20 +323,8 @@ export default function PrescriptionStudio({
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
               <button
                 type="button"
+                className="btn-listen-voice"
                 onClick={onPlayAudio}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '0.5rem 1rem',
-                  borderRadius: '8px',
-                  border: 'none',
-                  background: '#0284c7',
-                  color: '#ffffff',
-                  fontWeight: 600,
-                  fontSize: '0.88rem',
-                  cursor: 'pointer'
-                }}
               >
                 🔊 Listen Voice
               </button>
