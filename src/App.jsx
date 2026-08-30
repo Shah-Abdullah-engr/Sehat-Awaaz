@@ -17,16 +17,17 @@ export default function App() {
   const isPatientView = Boolean(scanMedKey);
 
   const [selectedPreset, setSelectedPreset] = useState('Augmentin 1g');
-  const [searchTerm, setSearchTerm] = useState('Augmentin 625mg');
-  const [dosage, setDosage] = useState('1 Tablet every 12 Hours (Twice Daily) for 5 Days');
+  const [searchTerm, setSearchTerm] = useState('Panadol 500mg');
+  const [dosage, setDosage] = useState('1 to 2 Tablets every 6 to 8 hours');
   const [purpose, setPurpose] = useState('Pain and Fever Relief');
-  const [urduPrompt, setUrduPrompt] = useState('یہ گولی صبح اور شام کھانا کھانے کے بعد لیں، کورس پورا کریں');
-  const [phoneticPrompt, setPhoneticPrompt] = useState('Yeh goli subah aur shaam khaana khaane ke baad lein. Course poora karein.');
+  const [urduPrompt, setUrduPrompt] = useState('یہ دوا درد اور بخار اتارنے کے لیے ہے۔ پانی کے ساتھ لیں۔');
+  const [phoneticPrompt, setPhoneticPrompt] = useState('Yeh dawa dard aur bukhaar utaarne ke liye hai. Paani ke saath lein.');
   const [timing, setTiming] = useState({
-  morning: true,
-  noon: false,
-  night: true
-});
+    morning: true,
+    noon: false,
+    night: true
+  });
+  
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const qrCanvasRef = useRef(null);
@@ -38,11 +39,11 @@ export default function App() {
       dosage: 'AI Data Load ho raha hai...',
       urduPrompt: 'ہدایات لوڈ ہو رہی ہیں...',
       phoneticPrompt: 'Hidayat load ho rahi hain...',
-      schedule: { morning: true, night: true }
+      timing: { morning: true, noon: false, night: true }
     };
   });
 
-  // Patient Mobile View
+  // Patient Mobile View Logic
   useEffect(() => {
     if (isPatientView && scanMedKey && !AI_DRUG_DATABASE[scanMedKey]) {
       const getPatientAI = async () => {
@@ -53,7 +54,7 @@ export default function App() {
             dosage: aiResult.dosage,
             urduPrompt: aiResult.urduPrompt,
             phoneticPrompt: aiResult.phoneticPrompt || aiResult.urduPrompt,
-            schedule: aiResult.timing
+            timing: aiResult.timing || { morning: true, noon: false, night: true }
           });
         }
       };
@@ -61,67 +62,70 @@ export default function App() {
     }
   }, [isPatientView, scanMedKey]);
 
-  // Presets select
+  // Preset Selection Logic
   const handlePresetSelect = (presetName) => {
     setSelectedPreset(presetName);
-    const key = presetName.toLowerCase();
+    const key = presetName.toLowerCase().trim();
     
     if (AI_DRUG_DATABASE[key]) {
       const entry = AI_DRUG_DATABASE[key];
-      setSearchTerm(entry.name);
+      setSearchTerm(presetName);
       setDosage(entry.dosage);
+      setPurpose(entry.purpose || "General Purpose");
       setUrduPrompt(entry.urduPrompt);
       setPhoneticPrompt(entry.phoneticPrompt || entry.urduPrompt);
-      setTiming(entry.schedule);
+      setTiming(entry.timing || entry.schedule || { morning: true, noon: false, night: true });
     } else {
       setSearchTerm(presetName);
     }
   };
 
-  // Nayi Dawai Search Logic
+  // Medicine Search & AI Fetching Logic
   useEffect(() => {
     const key = searchTerm.toLowerCase().trim();
     if (!key) return;
 
+    // 1. Check Pre-saved Database
     if (AI_DRUG_DATABASE[key]) {
       const entry = AI_DRUG_DATABASE[key];
       setDosage(entry.dosage);
       setPurpose(entry.purpose || "General Purpose");
       setUrduPrompt(entry.urduPrompt);
       setPhoneticPrompt(entry.phoneticPrompt || entry.urduPrompt);
-      setTiming(entry.schedule);
+      setTiming(entry.timing || entry.schedule || { morning: true, noon: false, night: true });
       return;
     }
 
+    // 2. Fetch from Gemini AI
     const fetchFromAI = async () => {
-      setDosage("Generating smart dosage...");
-      setPurpose("AI is checking purpose...");
-      setUrduPrompt("AI ہدایات لکھ رہا ہے...");
+      setDosage("AI تجویز کر رہا ہے...");
+      setPurpose("AI مقصد تلاش کر رہا ہے...");
+      setUrduPrompt("AI ہدایات تیار کر رہا ہے...");
 
       const aiResult = await fetchMedicineFromAI(searchTerm);
       
       if (aiResult) {
         setDosage(aiResult.dosage);
-        setPurpose(aiResult.purpose);
+        setPurpose(aiResult.purpose || "General Medication");
         setUrduPrompt(aiResult.urduPrompt);
         setPhoneticPrompt(aiResult.phoneticPrompt || aiResult.urduPrompt);
-        setTiming(aiResult.timing);
+        setTiming(aiResult.timing || { morning: true, noon: false, night: true });
       } else {
-        setDosage("Please enter dosage manually");
-        setPurpose("Not Found");
-        setUrduPrompt("براہ کرم ہدایات خود درج کریں۔");
-        setPhoneticPrompt("Barae meherbani hidayat khud darj karein.");
+        setDosage("1 Tablet twice daily");
+        setPurpose("General Medication");
+        setUrduPrompt("یہ دوا ڈاکٹر کی ہدایت کے مطابق استعمال کریں۔");
+        setPhoneticPrompt("Yeh dawa doctor ki hidayat ke mutabiq istemal karein.");
       }
     };
 
     const timeoutId = setTimeout(() => {
       fetchFromAI();
-    }, 1200);
+    }, 1000);
 
     return () => clearTimeout(timeoutId);
   }, [searchTerm]);
 
-  // QR Code
+  // QR Code Rendering
   useEffect(() => {
     if (qrCanvasRef.current && !isPatientView) {
       const baseUrl = window.location.origin;
@@ -135,6 +139,7 @@ export default function App() {
     }
   }, [searchTerm, isPatientView]);
 
+  // Audio Play / Stop Handler
   const toggleAudio = (textToPlay) => {
     if (isPlayingAudio) {
       stopAudio();
@@ -149,6 +154,7 @@ export default function App() {
     }
   };
 
+  // Voice Search Handler
   const handleVoiceSearch = () => {
     setIsListening(true);
     startVoiceRecognition(
@@ -160,7 +166,10 @@ export default function App() {
     );
   };
 
+  // Patient Mobile View
   if (isPatientView) {
+    const activeTiming = scannedData.timing || scannedData.schedule || { morning: true, noon: false, night: true };
+
     return (
       <div className="patient-mobile-wrapper">
         <div className="patient-card">
@@ -173,9 +182,9 @@ export default function App() {
           <div className="patient-dose-badge">{scannedData.dosage}</div>
 
           <div className="patient-schedule-chips">
-            <span className={`chip ${scannedData.schedule?.morning ? 'active' : ''}`}>☀️ صبح (Morning)</span>
-            <span className={`chip ${scannedData.schedule?.noon ? 'active' : ''}`}>☀️ دوپہر (Noon)</span>
-            <span className={`chip ${scannedData.schedule?.night ? 'active' : ''}`}>🌙 رات (Night)</span>
+            <span className={`chip ${activeTiming?.morning ? 'active' : ''}`}>☀️ صبح (Morning)</span>
+            <span className={`chip ${activeTiming?.noon ? 'active' : ''}`}>☀️ دوپہر (Noon)</span>
+            <span className={`chip ${activeTiming?.night ? 'active' : ''}`}>🌙 رات (Night)</span>
           </div>
 
           <div className="patient-urdu-box">
@@ -205,6 +214,7 @@ export default function App() {
     );
   }
 
+  // Doctor Dashboard View
   return (
     <div className="app-wrapper">
       <Navbar />
@@ -215,22 +225,18 @@ export default function App() {
           onSelectPreset={handlePresetSelect}
         />
 
-       
-<PrescriptionStudio
-  searchTerm={searchTerm}
-  setSearchTerm={setSearchTerm}
-  dosage={dosage}
-  setDosage={setDosage}
-  purpose={purpose}
-  urduPrompt={urduPrompt}
-  setUrduPrompt={setUrduPrompt}
-  timing={timing}
-  setTiming={setTiming}
-  onVoiceListen={() => toggleAudio(phoneticPrompt)}
-  isPlayingAudio={isPlayingAudio}
-  onVoiceSearch={handleVoiceSearch}
-  isListening={isListening}
-/>
+        <PrescriptionStudio
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          isListening={isListening}
+          onVoiceSearch={handleVoiceSearch}
+          purpose={purpose}
+          dosage={dosage}
+          urduPrompt={urduPrompt}
+          timing={timing}
+          setTiming={setTiming}
+          onPlayAudio={() => toggleAudio(phoneticPrompt || urduPrompt)}
+        />
 
         <StickerPreview
           qrCanvasRef={qrCanvasRef}
