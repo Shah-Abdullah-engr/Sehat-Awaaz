@@ -13,24 +13,21 @@ const PHONETIC_MAP = {
     "Yeh capsule subah naashte se aadha ghanta pehle khaali pet paani ke saath lein."
 };
 
-if (typeof window !== 'undefined') {
-  window._activeUtterances = [];
-}
+let currentAudio = null;
 
 export function stopAudio() {
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio = null;
+  }
   if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
     window.speechSynthesis.cancel();
-    window._activeUtterances = [];
   }
 }
 
 export function playAlibabaTTS(text, onStart, onEnd) {
-  if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
-    onEnd?.();
-    return;
-  }
-
-  // 1. Purani audio kill karein aur audio buffer saaf karein
+  // 1. Purana jo bhi chal raha ho foran band karo
   stopAudio();
 
   const cleanText = (text || '').trim();
@@ -39,69 +36,60 @@ export function playAlibabaTTS(text, onStart, onEnd) {
     return;
   }
 
-  // 2. Mobile Audio Engine Wakeup
-  if (window.speechSynthesis.paused) {
-    window.speechSynthesis.resume();
+  const spokenText = PHONETIC_MAP[cleanText] || cleanText;
+
+  // 2. Solid Solution: HTML5 Audio Stream (Mobile par kabhi freeze nahi hota)
+  const isUrduScript = /[\u0600-\u06FF]/.test(cleanText);
+  const lang = isUrduScript ? 'ur' : 'hi';
+  const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(spokenText)}&tl=${lang}&client=tw-ob`;
+
+  try {
+    currentAudio = new Audio(audioUrl);
+
+    currentAudio.onplay = () => {
+      onStart?.();
+    };
+
+    currentAudio.onended = () => {
+      currentAudio = null;
+      onEnd?.();
+    };
+
+    currentAudio.onerror = () => {
+      currentAudio = null;
+      playBrowserFallback(spokenText, onStart, onEnd);
+    };
+
+    // Mobile Audio Trigger
+    const playPromise = currentAudio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        playBrowserFallback(spokenText, onStart, onEnd);
+      });
+    }
+
+  } catch (err) {
+    playBrowserFallback(spokenText, onStart, onEnd);
+  }
+}
+
+// Network fail hone par browser fallback
+function playBrowserFallback(spokenText, onStart, onEnd) {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+    onEnd?.();
+    return;
   }
 
-  // 3. Mobile Chrome Fix: 80ms delay taake mobile audio engine buffer free kar le
-  setTimeout(() => {
-    try {
-      const spokenText = PHONETIC_MAP[cleanText] || cleanText;
-      const utterance = new SpeechSynthesisUtterance(spokenText);
-      
-      utterance.rate = 0.88;
-      utterance.pitch = 1.0;
-      utterance.lang = 'hi-IN';
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(spokenText);
+  utterance.lang = 'hi-IN';
+  utterance.rate = 0.88;
 
-      const voices = window.speechSynthesis.getVoices() || [];
-      
-      const bestFemaleVoice = voices.find(v => 
-        v.name.includes('Google हिन्दी') || 
-        v.name.includes('Swara') || 
-        v.name.includes('Heera') || 
-        v.name.includes('Gul')
-      ) || voices.find(v => 
-        (v.lang.includes('hi') || v.lang.includes('ur') || v.lang.includes('IN')) && 
-        !v.name.toLowerCase().includes('male') && 
-        !v.name.toLowerCase().includes('david') && 
-        !v.name.toLowerCase().includes('mark')
-      );
+  utterance.onstart = () => onStart?.();
+  utterance.onend = () => onEnd?.();
+  utterance.onerror = () => onEnd?.();
 
-      if (bestFemaleVoice) {
-        utterance.voice = bestFemaleVoice;
-        utterance.lang = bestFemaleVoice.lang;
-      }
-
-      let finished = false;
-      const cleanup = () => {
-        if (!finished) {
-          finished = true;
-          window._activeUtterances = window._activeUtterances.filter(u => u !== utterance);
-          onEnd?.();
-        }
-      };
-
-      utterance.onstart = () => onStart?.();
-      utterance.onend = () => cleanup();
-      utterance.onerror = (e) => {
-        if (e.error !== 'interrupted' && e.error !== 'canceled') {
-          console.warn("TTS Error:", e.error);
-        }
-        cleanup();
-      };
-
-      // Memory reference lock
-      window._activeUtterances.push(utterance);
-      
-      // Speak
-      window.speechSynthesis.speak(utterance);
-
-    } catch (err) {
-      console.error("TTS Execution Error:", err);
-      onEnd?.();
-    }
-  }, 80);
+  window.speechSynthesis.speak(utterance);
 }
 
 export function startVoiceRecognition(onResult, onError) {
