@@ -160,5 +160,234 @@ export const AI_DRUG_DATABASE = {
     urduPrompt: "یہ دوا شوگر لیول کو کنٹرول رکھنے کے لیے ہے۔ کھانا کھانے کے بعد لیں۔",
     phoneticPrompt: "Yeh dawa sugar level ko control rakhne ke liye hai. Khaana khaane ke baad lein.",
     timing: { morning: true, noon: false, night: true }
+  },
+  // ================= 1. SAR AUR DIMAGH (Neurological) =================
+  "synflex": {
+    dosage: "1 Tablet after meals",
+    purpose: "Migraine and Severe Headache",
+    urduPrompt: "یہ گولی آدھے سر کے درد یا شدید درد میں کھانا کھانے کے بعد لیں۔",
+    phoneticPrompt: "Yeh goli aadhe sar ke dard ya shadeed dard mein khaana khaane ke baad lein.",
+    timing: { morning: true, noon: false, night: true }
+  },
+  "serc": {
+    dosage: "1 Tablet Twice Daily",
+    purpose: "Vertigo and Dizziness",
+    urduPrompt: "یہ گولی چکر آنے کی صورت میں دن میں دو بار پانی کے ساتھ لیں۔",
+    phoneticPrompt: "Yeh goli chakkar aane ki soorat mein din mein do baar paani ke saath lein.",
+    timing: { morning: true, noon: false, night: true }
+  },
+  "nuberol forte": {
+    dosage: "1 Tablet Twice Daily",
+    purpose: "Muscle Spasms and Tension Headache",
+    urduPrompt: "یہ گولی پٹھوں کے کھنچاؤ اور درد کے لیے دن میں دو بار لیں۔",
+    phoneticPrompt: "Yeh goli pathon ke khinchao aur dard ke liye din mein do baar lein.",
+    timing: { morning: true, noon: false, night: true }
+  },
+
+  // ================= 2. AANKH, KAAN, NAAK, GALA (ENT & Eyes) =================
+  "betnesol-n": {
+    dosage: "1 to 2 Drops 3 times daily",
+    purpose: "Eye/Ear Infection and Allergies",
+    urduPrompt: "یہ قطرے آنکھ یا کان کے انفیکشن کے لیے دن میں تین بار ڈالیں۔",
+    phoneticPrompt: "Yeh qatray aankh ya kaan ke infection ke liye din mein teen baar daalein.",
+    timing: { morning: true, noon: true, night: true }
+  },
+  "xylin": {
+    dosage: "1 to 2 Sprays per nostril",
+    purpose: "Nasal Congestion",
+    urduPrompt: "یہ سپرے بند ناک کھولنے کے لیے استعمال کریں۔",
+    phoneticPrompt: "Yeh spray band naak kholne ke liye istemal karein.",
+    timing: { morning: true, noon: true, night: true }
+  },
+  "strepsils": {
+    dosage: "1 Lozenge every 3 hours",
+    purpose: "Sore Throat",
+    urduPrompt: "یہ گولی گلے کی خراش دور کرنے کے لیے منہ میں رکھ کر چوسیں۔",
+    phoneticPrompt: "Yeh goli galay ki kharaash door karne ke liye munh mein rakh kar choosein.",
+    timing: { morning: true, noon: true, night: true }
+  },
+
+  // ================= 3. SAANS AUR SEENA (Respiratory) =================
+  "ventolin": {
+    dosage: "1 to 2 Puffs when needed",
+    purpose: "Asthma and Shortness of Breath",
+    urduPrompt: "یہ انہیلر سانس پھولنے یا دمے کی صورت میں استعمال کریں۔",
+    phoneticPrompt: "Yeh inhaler saans phoolne ya damay ki soorat mein istemal karein.",
+    timing: { morning: true, noon: true, night: true }
+  },
+  "sancos": {
+    dosage: "2 Teaspoons 3 times a day",
+    purpose: "Dry Cough",
+    urduPrompt: "یہ شربت خشک کھانسی کے لیے دن میں تین بار دو دو چمچ پیئیں۔",
+    phoneticPrompt: "Yeh syrup khushk khaansi ke liye din mein teen baar do do chamach piyein.",
+    timing: { morning: true, noon: true, night: true }
+  },
+
+  // ================= 4. PAIT, MAIDA AUR DAST (Gastrointestinal) =================
+  "buscopan plus": {
+    dosage: "1 Tablet when needed",
+    purpose: "Abdominal Cramps",
+    urduPrompt: "یہ گولی پیٹ میں درد یا مروڑ ہونے کی صورت میں لیں۔",
+    phoneticPrompt: "Yeh goli pet mein dard ya maror hone ki soorat mein lein.",
+    timing: { morning: true, noon: true, night: true }
+  },
+  "imodium": {
+    dosage: "1 to 2 Capsules after first loose motion",
+    purpose: "Acute Diarrhea",
+    urduPrompt: "یہ کیپسول موشن فوری طور پر روکنے کے لیے پانی کے ساتھ لیں۔",
+    phoneticPrompt: "Yeh capsule motion fori taur par rokne ke liye paani ke saath lein.",
+    timing: { morning: true, noon: true, night: true }
+  },
+  "motilium": {
+    dosage: "1 Tablet before meals",
+    purpose: "Nausea and Vomiting",
+    urduPrompt: "یہ گولی الٹی، متلی اور بدہضمی کے لیے کھانا کھانے سے پہلے لیں۔",
+    phoneticPrompt: "Yeh goli ulti, matli aur badhazmi ke liye khaana khaane se pehle lein.",
+    timing: { morning: true, noon: true, night: true }
+  },
+  "ors nimkol": {
+    dosage: "1 Sachet in 1 Litre water",
+    purpose: "Dehydration",
+    urduPrompt: "یہ ساشے ایک لیٹر پانی میں حل کر کے وقفے وقفے سے پیتے رہیں۔",
+    phoneticPrompt: "Yeh sachet ek litre paani mein hal kar ke waqfay waqfay se peetay rahein.",
+    timing: { morning: true, noon: true, night: true }
+  },
+
+  // ================= 5. JILD, BAAL AUR CHOTAIN (Dermatology & First Aid) =================
+  "fucidin": {
+    dosage: "Apply twice a day",
+    purpose: "Skin infections and Boils",
+    urduPrompt: "یہ کریم زخم یا دانوں پر دن میں دو بار لگائیں۔",
+    phoneticPrompt: "Yeh cream zakham ya daanon par din mein do baar lagayein.",
+    timing: { morning: true, noon: false, night: true }
+  },
+  "canesten": {
+    dosage: "Apply 2 times a day",
+    purpose: "Fungal Infection and Itching",
+    urduPrompt: "یہ کریم خارش اور فنگس والی جگہ پر دن میں دو بار لگائیں۔",
+    phoneticPrompt: "Yeh cream khaarish aur fungus wali jagah par din mein do baar lagayein.",
+    timing: { morning: true, noon: false, night: true }
+  },
+  "burnol": {
+    dosage: "Apply immediately on burn",
+    purpose: "Minor Burns",
+    urduPrompt: "یہ کریم جلی ہوئی جگہ پر فوری طور پر ٹھنڈک اور انفیکشن سے بچاؤ کے لیے لگائیں۔",
+    phoneticPrompt: "Yeh cream jali hui jagah par fori taur par thandak aur infection se bachaao ke liye lagayein.",
+    timing: { morning: true, noon: true, night: true }
+  },
+  "rigix": {
+    dosage: "1 Tablet at night",
+    purpose: "Skin Allergy and Sneezing",
+    urduPrompt: "یہ گولی الرجی اور چھینکوں کے لیے رات کو سونے سے پہلے لیں۔",
+    phoneticPrompt: "Yeh goli allergy aur chheenkain ke liye raat ko sone se pehle lein.",
+    timing: { morning: false, noon: false, night: true }
+  },
+
+  // ================= 6. HADDIYAN, JOR AUR VITAMINS (Musculoskeletal) =================
+  "dicloran": {
+    dosage: "1 Tablet after meals",
+    purpose: "Joint Pain and Swelling",
+    urduPrompt: "یہ گولی جوڑوں اور ہڈیوں کے درد کے لیے کھانے کے بعد لیں۔",
+    phoneticPrompt: "Yeh goli joron aur haddiyon ke dard ke liye khaane ke baad lein.",
+    timing: { morning: true, noon: false, night: true }
+  },
+  "cac 1000 plus": {
+    dosage: "1 Effervescent Tablet daily",
+    purpose: "Calcium Deficiency",
+    urduPrompt: "یہ گولی ایک گلاس پانی میں حل کر کے روزانہ پیئیں۔",
+    phoneticPrompt: "Yeh goli ek glass paani mein hal kar ke rozana piyein.",
+    timing: { morning: true, noon: false, night: false }
+  },
+  "sunny d": {
+    dosage: "1 Capsule as directed",
+    purpose: "Vitamin D Deficiency",
+    urduPrompt: "یہ وٹامن ڈی دودھ میں ملا کر یا ڈاکٹر کی ہدایت کے مطابق لیں۔",
+    phoneticPrompt: "Yeh vitamin D doodh mein mila kar ya doctor ki hidayat ke mutabiq lein.",
+    timing: { morning: true, noon: false, night: false }
+  },
+  "neurobion": {
+    dosage: "1 Tablet Daily",
+    purpose: "Nerve Pain and Fatigue",
+    urduPrompt: "یہ گولی اعصابی کمزوری اور پٹھوں کی طاقت کے لیے روزانہ ایک بار لیں۔",
+    phoneticPrompt: "Yeh goli asaabi kamzori aur pathon ki taaqat ke liye rozana ek baar lein.",
+    timing: { morning: true, noon: false, night: false }
+  },
+
+  // ================= 7. KHAWATEEN AUR PREGNANCY (Women's Health) =================
+  "ponstan forte": {
+    dosage: "1 Tablet Twice Daily",
+    purpose: "Period Cramps",
+    urduPrompt: "یہ گولی ماہواری کے درد اور تکلیف میں کھانے کے بعد لیں۔",
+    phoneticPrompt: "Yeh goli mahwaari ke dard aur takleef mein khaane ke baad lein.",
+    timing: { morning: true, noon: false, night: true }
+  },
+  "iberet folic": {
+    dosage: "1 Tablet Daily",
+    purpose: "Pregnancy Anemia",
+    urduPrompt: "یہ خون بنانے والی گولی ہے، اسے روزانہ ایک بار پانی کے ساتھ لیں۔",
+    phoneticPrompt: "Yeh khoon banane wali goli hai, isay rozana ek baar paani ke saath lein.",
+    timing: { morning: true, noon: false, night: false }
+  },
+  "gravinate": {
+    dosage: "1 Tablet When Needed",
+    purpose: "Morning Sickness",
+    urduPrompt: "یہ گولی الٹی اور متلی کو روکنے کے لیے استعمال کریں۔",
+    phoneticPrompt: "Yeh goli ulti aur matli ko rokne ke liye istemal karein.",
+    timing: { morning: true, noon: true, night: true }
+  },
+
+  // ================= 8. GURDAY AUR PESHAB (Urinary) =================
+  "cranmax": {
+    dosage: "1 to 2 Sachets Daily",
+    purpose: "UTI and Burning Micturition",
+    urduPrompt: "یہ ساشے ایک گلاس پانی میں حل کر کے پیئیں، پیشاب کی جلن کے لیے۔",
+    phoneticPrompt: "Yeh sachet ek glass paani mein hal kar ke piyein, peshaab ki jalan ke liye.",
+    timing: { morning: true, noon: false, night: true }
+  },
+  "novidat": {
+    dosage: "1 Tablet Twice Daily",
+    purpose: "Urinary Tract Infection",
+    urduPrompt: "یہ اینٹی بائیوٹک گولی پیشاب کے انفیکشن کے لیے ڈاکٹر کی ہدایت کے مطابق لیں۔",
+    phoneticPrompt: "Yeh antibiotic goli peshaab ke infection ke liye doctor ki hidayat ke mutabiq lein.",
+    timing: { morning: true, noon: false, night: true }
+  },
+  "rowatinex": {
+    dosage: "1 to 2 Capsules 3 times daily",
+    purpose: "Kidney Stones",
+    urduPrompt: "یہ کیپسول گردے کی پتھری کے درد میں کھانے سے پہلے لیں۔",
+    phoneticPrompt: "Yeh capsule gurday ki pathri ke dard mein khaane se pehle lein.",
+    timing: { morning: true, noon: true, night: true }
+  },
+
+  // ================= 9. MUNH AUR DAANT (Dental & Oral) =================
+  "somogel": {
+    dosage: "Apply small quantity",
+    purpose: "Mouth Ulcers",
+    urduPrompt: "یہ جیل منہ کے چھالوں اور زخم پر دن میں تین سے چار بار لگائیں۔",
+    phoneticPrompt: "Yeh gel munh ke chhalon aur zakham par din mein teen se chaar baar lagayein.",
+    timing: { morning: true, noon: true, night: true }
+  },
+  "sensodyne": {
+    dosage: "Brush twice daily",
+    purpose: "Teeth Sensitivity",
+    urduPrompt: "یہ ٹوتھ پیسٹ دانتوں کی حساسیت دور کرنے کے لیے روزانہ دو بار استعمال کریں۔",
+    phoneticPrompt: "Yeh toothpaste daanton ki hasasiyat door karne ke liye rozana do baar istemal karein.",
+    timing: { morning: true, noon: false, night: true }
+  },
+
+  // ================= 10. ZEHNI SEHAT AUR NEEND (Mental Health & Sleep) =================
+  "melatonin": {
+    dosage: "1 Tablet 30 mins before bedtime",
+    purpose: "Insomnia",
+    urduPrompt: "یہ گولی رات کو سونے سے آدھا گھنٹہ پہلے لیں تاکہ نیند پرسکون آئے۔",
+    phoneticPrompt: "Yeh goli raat ko sone se aadha ghanta pehle lein taake neend pursukoon aaye.",
+    timing: { morning: false, noon: false, night: true }
+  },
+  "surbex z": {
+    dosage: "1 Tablet Daily",
+    purpose: "Physical Weakness and Stress",
+    urduPrompt: "یہ وٹامن کی گولی جسمانی اور اعصابی تھکاوٹ دور کرنے کے لیے روزانہ ایک بار لیں۔",
+    phoneticPrompt: "Yeh vitamin ki goli jismaani aur asaabi thakawat door karne ke liye rozana ek baar lein.",
+    timing: { morning: true, noon: false, night: false }
   }
 };
