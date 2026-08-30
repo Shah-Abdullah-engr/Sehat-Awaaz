@@ -16,6 +16,8 @@ export default function PrescriptionStudio({
   isListening
 }) {
   const [showDropdown, setShowDropdown] = useState(false);
+  // Timing Buttons Section
+const safeTiming = timing || { morning: false, noon: false, night: false };
 
   return (
     <section className="col-center glass-card no-print">
@@ -103,24 +105,33 @@ export default function PrescriptionStudio({
         />
       </div>
 
-      {/* Timing Schedule */}
-      <div className="form-group">
-        <label className="section-label">Modern Timing/Frequency</label>
-        <div className="timing-pills-row">
-          <button
-            className={`timing-pill ${timing.morning ? 'active' : ''}`}
-            onClick={() => setTiming((prev) => ({ ...prev, morning: !prev.morning }))}
-          >
-            ☀️ Morning
-          </button>
-          <button
-            className={`timing-pill ${timing.night ? 'active' : ''}`}
-            onClick={() => setTiming((prev) => ({ ...prev, night: !prev.night }))}
-          >
-            🌙 Night
-          </button>
-        </div>
-      </div>
+      {/* Baqi UI Code */}
+  <div className="flex gap-2 my-4">
+    <button
+      type="button"
+      className={`px-4 py-2 rounded-lg font-medium border ${safeTiming.morning ? 'bg-amber-100 border-amber-400 text-amber-900' : 'bg-white border-slate-200'}`}
+      onClick={() => setTiming && setTiming(prev => ({ ...(prev || {}), morning: !prev?.morning }))}
+    >
+      ☀️ Morning
+    </button>
+
+    <button
+      type="button"
+      className={`px-4 py-2 rounded-lg font-medium border ${safeTiming.noon ? 'bg-amber-100 border-amber-400 text-amber-900' : 'bg-white border-slate-200'}`}
+      onClick={() => setTiming && setTiming(prev => ({ ...(prev || {}), noon: !prev?.noon }))}
+    >
+      🌤️ Noon
+    </button>
+
+    <button
+      type="button"
+      className={`px-4 py-2 rounded-lg font-medium border ${safeTiming.night ? 'bg-indigo-100 border-indigo-400 text-indigo-900' : 'bg-white border-slate-200'}`}
+      onClick={() => setTiming && setTiming(prev => ({ ...(prev || {}), night: !prev?.night }))}
+    >
+      🌙 Night
+    </button>
+  </div>
+);
 
       {/* Urdu Audio Script Box (Pehle jesa hi hai) */}
       <div className="form-group">

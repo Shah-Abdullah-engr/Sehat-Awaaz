@@ -22,7 +22,11 @@ export default function App() {
   const [purpose, setPurpose] = useState('Pain and Fever Relief');
   const [urduPrompt, setUrduPrompt] = useState('یہ گولی صبح اور شام کھانا کھانے کے بعد لیں، کورس پورا کریں');
   const [phoneticPrompt, setPhoneticPrompt] = useState('Yeh goli subah aur shaam khaana khaane ke baad lein. Course poora karein.');
-  const [timing, setTiming] = useState({ morning: true, night: true });
+  const [timing, setTiming] = useState({
+  morning: true,
+  noon: false,
+  night: true
+});
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const qrCanvasRef = useRef(null);

@@ -1,19 +1,19 @@
-import React from 'react';
-
-export default function StickerPreview({
-  qrCanvasRef,
-  patientName,
-  selectedMed,
-  dosage,
-  timing,
-  onPrint
+// src/components/stickerpreview.jsx
+export default function StickerPreview({ 
+  patientName = "S. Khan", 
+  selectedMed = "Panadol", 
+  timing = { morning: true, noon: false, night: true }, 
+  qrCanvasRef, 
+  onPrint 
 }) {
+  const safeTiming = timing || { morning: false, noon: false, night: false };
+
   return (
     <section className="col-right">
       <div className="glass-card preview-card">
         <h3 className="card-title preview-heading no-print">LIVE STICKER PREVIEW</h3>
 
-        {/* Physical Thermal Sticker with Serrated Jagged Edge */}
+        {/* Physical Thermal Sticker */}
         <div className="thermal-paper">
           <div className="inner-label-border">
             <h4 className="label-header">SEHAT AWAAZ</h4>
@@ -24,7 +24,10 @@ export default function StickerPreview({
               <div><strong>Med:</strong> {selectedMed}</div>
               <div><strong>Dose:</strong> 1 Tab (2x Day)</div>
               <div>
-                <strong>Visual Cues:</strong> ☀️[{timing.morning ? '✔' : ' '}] 🌙[{timing.night ? '✔' : ' '}]
+                <strong>Visual Cues: </strong> 
+                ☀️[{safeTiming?.morning ? '✓' : ' '}] 
+                🌤️[{safeTiming?.noon ? '✓' : ' '}] 
+                🌙[{safeTiming?.night ? '✓' : ' '}]
               </div>
             </div>
 
@@ -34,9 +37,16 @@ export default function StickerPreview({
           </div>
         </div>
 
-        <button className="approve-print-btn no-print" onClick={onPrint}>
-          APPROVE & 1-CLICK PRINT (5s)
-        </button>
+        {onPrint && (
+          <button 
+            type="button" 
+            onClick={onPrint} 
+            className="btn btn-primary no-print" 
+            style={{ marginTop: '1rem', width: '100%' }}
+          >
+            🖨️ Print Label Sticker
+          </button>
+        )}
       </div>
     </section>
   );
