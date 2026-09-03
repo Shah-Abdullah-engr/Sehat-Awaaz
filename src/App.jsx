@@ -221,7 +221,7 @@ export default function App() {
 
       <main className="dashboard-grid">
         <PresetsPanel
-          selectedPreset={selectedPreset}
+          selectedPreset={searchTerm}
           onSelectPreset={handlePresetSelect}
         />
 
