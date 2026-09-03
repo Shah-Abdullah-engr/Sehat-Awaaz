@@ -1,4 +1,4 @@
-// src/App.jsx
+
 import React, { useState, useEffect, useRef } from 'react';
 import QRCode from 'qrcode';
 import { AI_DRUG_DATABASE } from './data/medicinedatabase';
@@ -43,7 +43,6 @@ export default function App() {
     };
   });
 
-  // Patient Mobile View Logic
   useEffect(() => {
     if (isPatientView && scanMedKey && !AI_DRUG_DATABASE[scanMedKey]) {
       const getPatientAI = async () => {
@@ -62,7 +61,7 @@ export default function App() {
     }
   }, [isPatientView, scanMedKey]);
 
-  // Preset Selection Logic
+
   const handlePresetSelect = (presetName) => {
     setSelectedPreset(presetName);
     const key = presetName.toLowerCase().trim();
@@ -80,12 +79,11 @@ export default function App() {
     }
   };
 
-  // Medicine Search & AI Fetching Logic
+
   useEffect(() => {
     const key = searchTerm.toLowerCase().trim();
     if (!key) return;
 
-    // 1. Check Pre-saved Database
     if (AI_DRUG_DATABASE[key]) {
       const entry = AI_DRUG_DATABASE[key];
       setDosage(entry.dosage);
@@ -96,7 +94,6 @@ export default function App() {
       return;
     }
 
-    // 2. Fetch from Gemini AI
     const fetchFromAI = async () => {
       setDosage("AI تجویز کر رہا ہے...");
       setPurpose("AI مقصد تلاش کر رہا ہے...");
@@ -125,7 +122,7 @@ export default function App() {
     return () => clearTimeout(timeoutId);
   }, [searchTerm]);
 
-  // QR Code Rendering
+
   useEffect(() => {
     if (qrCanvasRef.current && !isPatientView) {
       const baseUrl = window.location.origin;
@@ -139,7 +136,7 @@ export default function App() {
     }
   }, [searchTerm, isPatientView]);
 
-  // Audio Play / Stop Handler
+
   const toggleAudio = (textToPlay) => {
     if (isPlayingAudio) {
       stopAudio();
@@ -154,7 +151,7 @@ export default function App() {
     }
   };
 
-  // Voice Search Handler
+
   const handleVoiceSearch = () => {
     setIsListening(true);
     startVoiceRecognition(
@@ -166,7 +163,7 @@ export default function App() {
     );
   };
 
-  // Patient Mobile View
+
   if (isPatientView) {
     const activeTiming = scannedData.timing || scannedData.schedule || { morning: true, noon: false, night: true };
 
@@ -214,7 +211,7 @@ export default function App() {
     );
   }
 
-  // Doctor Dashboard View
+
   return (
     <div className="app-wrapper">
       <Navbar />

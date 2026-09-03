@@ -6,7 +6,7 @@ export const fetchMedicineFromAI = async (medicineName) => {
   const cleanKey = (medicineName || '').toLowerCase().trim();
   if (!cleanKey) return null;
 
-  // 1. Local Database Check (0ms)
+
   if (AI_DRUG_DATABASE[cleanKey]) {
     console.log("📁 Loaded from Pre-set Database:", cleanKey);
     return AI_DRUG_DATABASE[cleanKey];
@@ -24,7 +24,6 @@ export const fetchMedicineFromAI = async (medicineName) => {
     }
   }
 
-  // 3. Groq API Call with Alibaba Qwen Model
   const prompt = `
     Act as a medical data formatting tool for Pakistan.
     The user entered: "${medicineName}".
@@ -83,7 +82,7 @@ export const fetchMedicineFromAI = async (medicineName) => {
     console.warn("AI API call failed, using safe fallback...", err);
   }
 
-  // 4. Safe Fallback
+
   return {
     dosage: "1 Application / Tablet as directed",
     purpose: "Skincare / General Medication",

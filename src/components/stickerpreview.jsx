@@ -1,4 +1,4 @@
-// src/components/stickerpreview.jsx
+
 import React, { useEffect, useRef } from 'react';
 import QRCode from 'qrcode';
 
@@ -14,7 +14,7 @@ export default function StickerPreview({
   const activeCanvasRef = externalRef || localCanvasRef;
   const safeTiming = timing || { morning: false, noon: false, night: false };
 
-  // Guaranteed QR Code rendering on every change
+ 
   useEffect(() => {
     if (activeCanvasRef.current) {
       const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
@@ -37,7 +37,7 @@ export default function StickerPreview({
 
   return (
     <section className="col-right" style={{ flex: 1 }}>
-      {/* Print Specific CSS (Popup Print Only Sticker) */}
+      
       <style>{`
         @media print {
           body * {
@@ -85,7 +85,7 @@ export default function StickerPreview({
           LIVE STICKER PREVIEW
         </h3>
 
-        {/* 1. Thermal Sticker Paper */}
+      
         <div 
           className="thermal-paper" 
           style={{
@@ -109,7 +109,7 @@ export default function StickerPreview({
             </p>
           </div>
 
-          {/* Patient Details */}
+        
           <div style={{ fontSize: '0.86rem', color: '#1e293b', display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <div><strong style={{ color: '#475569' }}>Patient:</strong> <span style={{ fontWeight: 600 }}>{patientName}</span></div>
             <div><strong style={{ color: '#475569' }}>Med:</strong> <span style={{ fontWeight: 700, color: '#0f172a' }}>{selectedMed}</span></div>
@@ -122,7 +122,7 @@ export default function StickerPreview({
             </div>
           </div>
 
-          {/* 2. QR Code Canvas Box */}
+       
           <div 
             className="qr-wrapper" 
             style={{ 
@@ -143,7 +143,7 @@ export default function StickerPreview({
           </div>
         </div>
 
-        {/* 3. Print Button */}
+        
         <div style={{ marginTop: '1.25rem' }}>
           <button 
             type="button" 

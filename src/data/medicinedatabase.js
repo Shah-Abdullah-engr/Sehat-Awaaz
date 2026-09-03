@@ -1,4 +1,4 @@
-// src/data/medicinedatabase.js
+
 export const AI_DRUG_DATABASE = {
   "panadol": {
     dosage: "1 to 2 Tablets every 6 hours",
@@ -161,7 +161,7 @@ export const AI_DRUG_DATABASE = {
     phoneticPrompt: "Yeh dawa sugar level ko control rakhne ke liye hai. Khaana khaane ke baad lein.",
     timing: { morning: true, noon: false, night: true }
   },
-  // ================= 1. SAR AUR DIMAGH (Neurological) =================
+
   "synflex": {
     dosage: "1 Tablet after meals",
     purpose: "Migraine and Severe Headache",
@@ -207,7 +207,7 @@ export const AI_DRUG_DATABASE = {
     timing: { morning: true, noon: true, night: true }
   },
 
-  // ================= 3. SAANS AUR SEENA (Respiratory) =================
+ 
   "ventolin": {
     dosage: "1 to 2 Puffs when needed",
     purpose: "Asthma and Shortness of Breath",
@@ -253,7 +253,7 @@ export const AI_DRUG_DATABASE = {
     timing: { morning: true, noon: true, night: true }
   },
 
-  // ================= 5. JILD, BAAL AUR CHOTAIN (Dermatology & First Aid) =================
+
   "fucidin": {
     dosage: "Apply twice a day",
     purpose: "Skin infections and Boils",
@@ -283,7 +283,6 @@ export const AI_DRUG_DATABASE = {
     timing: { morning: false, noon: false, night: true }
   },
 
-  // ================= 6. HADDIYAN, JOR AUR VITAMINS (Musculoskeletal) =================
   "dicloran": {
     dosage: "1 Tablet after meals",
     purpose: "Joint Pain and Swelling",
@@ -313,7 +312,7 @@ export const AI_DRUG_DATABASE = {
     timing: { morning: true, noon: false, night: false }
   },
 
-  // ================= 7. KHAWATEEN AUR PREGNANCY (Women's Health) =================
+
   "ponstan forte": {
     dosage: "1 Tablet Twice Daily",
     purpose: "Period Cramps",
@@ -336,7 +335,6 @@ export const AI_DRUG_DATABASE = {
     timing: { morning: true, noon: true, night: true }
   },
 
-  // ================= 8. GURDAY AUR PESHAB (Urinary) =================
   "cranmax": {
     dosage: "1 to 2 Sachets Daily",
     purpose: "UTI and Burning Micturition",
@@ -359,7 +357,7 @@ export const AI_DRUG_DATABASE = {
     timing: { morning: true, noon: true, night: true }
   },
 
-  // ================= 9. MUNH AUR DAANT (Dental & Oral) =================
+
   "somogel": {
     dosage: "Apply small quantity",
     purpose: "Mouth Ulcers",
@@ -375,7 +373,7 @@ export const AI_DRUG_DATABASE = {
     timing: { morning: true, noon: false, night: true }
   },
 
-  // ================= 10. ZEHNI SEHAT AUR NEEND (Mental Health & Sleep) =================
+
   "melatonin": {
     dosage: "1 Tablet 30 mins before bedtime",
     purpose: "Insomnia",

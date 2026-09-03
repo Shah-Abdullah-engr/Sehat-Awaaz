@@ -18,13 +18,12 @@ export default function PrescriptionStudio({
   const dropdownRef = useRef(null);
   const safeTiming = timing || { morning: false, noon: false, night: false };
 
-  // Dropdown filter
   const allMedicines = Object.keys(AI_DRUG_DATABASE || {});
   const filteredMedicines = allMedicines.filter((med) =>
     med.toLowerCase().includes(searchTerm.toLowerCase().trim())
   );
 
-  // Close dropdown on outside click
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -42,7 +41,7 @@ export default function PrescriptionStudio({
 
   return (
     <section className="col-center" style={{ flex: 1 }}>
-      {/* Hover & Active Button Animations */}
+    
       <style>{`
         .btn-listen-voice {
           display: inline-flex;
@@ -75,7 +74,7 @@ export default function PrescriptionStudio({
           AI PRESCRIPTION STUDIO
         </h3>
 
-        {/* 1. Search Bar with Autocomplete Dropdown */}
+       
         <div ref={dropdownRef} style={{ position: 'relative', marginBottom: '1.25rem' }}>
           <div style={{ display: 'flex', gap: '8px' }}>
             <div style={{ position: 'relative', flex: 1 }}>
@@ -128,7 +127,7 @@ export default function PrescriptionStudio({
             )}
           </div>
 
-          {/* Dropdown Suggestions */}
+          
           {showDropdown && filteredMedicines.length > 0 && (
             <ul
               style={{
@@ -174,7 +173,8 @@ export default function PrescriptionStudio({
           )}
         </div>
 
-        {/* 2. Medicine Purpose */}
+       
+       
         <div style={{ marginBottom: '1rem' }}>
           <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#475569', marginBottom: '6px' }}>
             Medicine Purpose (یہ دوا کس لیے ہے؟)
@@ -197,7 +197,7 @@ export default function PrescriptionStudio({
           />
         </div>
 
-        {/* 3. Suggested Dosage */}
+
         <div style={{ marginBottom: '1rem' }}>
           <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#475569', marginBottom: '6px' }}>
             AI Suggested Dosage
@@ -220,7 +220,7 @@ export default function PrescriptionStudio({
           />
         </div>
 
-        {/* 4. Timing Buttons / Chips */}
+       
         <div style={{ marginBottom: '1.25rem' }}>
           <div style={{ display: 'flex', gap: '8px' }}>
             <button
@@ -291,7 +291,7 @@ export default function PrescriptionStudio({
           </div>
         </div>
 
-        {/* 5. Urdu Audio Prompt Preview Box */}
+       
         <div>
           <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#475569', marginBottom: '6px' }}>
             Urdu Audio Prompt Preview

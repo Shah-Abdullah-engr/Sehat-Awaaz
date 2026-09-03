@@ -1,4 +1,4 @@
-// src/services/alibabaSpeech.js
+
 
 const PHONETIC_MAP = {
   "یہ گولی صبح اور شام کھانا کھانے کے بعد لیں، کورس پورا کریں":
@@ -27,7 +27,7 @@ export function stopAudio() {
 }
 
 export function playAlibabaTTS(text, onStart, onEnd) {
-  // 1. Purana jo bhi chal raha ho foran band karo
+
   stopAudio();
 
   const cleanText = (text || '').trim();
@@ -73,7 +73,6 @@ export function playAlibabaTTS(text, onStart, onEnd) {
   }
 }
 
-// Network fail hone par browser fallback
 function playBrowserFallback(spokenText, onStart, onEnd) {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
     onEnd?.();

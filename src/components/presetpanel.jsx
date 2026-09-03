@@ -5,7 +5,7 @@ export default function PresetsPanel({ selectedPreset, onSelectPreset }) {
 
   return (
     <section className="col-left no-print">
-      {/* Quick Prescriptions Card */}
+   
       <div className="glass-card presets-card">
         <h3 className="card-title">Quick Prescriptions</h3>
         <div className="preset-stack">
@@ -21,7 +21,7 @@ export default function PresetsPanel({ selectedPreset, onSelectPreset }) {
         </div>
       </div>
 
-      {/* Metric Cards Stack */}
+     
       <div className="metrics-stack">
         <div className="glass-card metric-card">
           <div className="metric-icon-box">

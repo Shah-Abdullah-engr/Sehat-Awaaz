@@ -30,7 +30,7 @@ body {
   padding: 24px;
 }
 
-/* Navbar */
+
 .top-nav {
   display: flex;
   justify-content: space-between;
@@ -416,9 +416,7 @@ body {
   transform: translateY(-1px);
 }
 
-/* ======================================================== */
-/* PATIENT MOBILE APP SCREEN (MODERN CLEAN DESIGN)           */
-/* ======================================================== */
+
 .patient-mobile-wrapper {
   min-height: 100vh;
   display: flex;
@@ -526,7 +524,7 @@ body {
   color: #0f172a;
 }
 
-/* Sound Wave Bars */
+
 .sound-wave {
   display: flex;
   justify-content: center;
@@ -580,14 +578,14 @@ body {
   line-height: 1.4;
 }
 
-/* Print CSS */
+
 @media print {
   body { background: #ffffff; }
   .no-print { display: none !important; }
   .dashboard-grid { display: block; }
   .thermal-paper { clip-path: none; box-shadow: none; padding: 0; width: 2.25in; }
 }
-/* Custom Dropdown Styling */
+
 .custom-med-dropdown {
   position: absolute;
   top: 100%;
@@ -618,9 +616,7 @@ body {
   background-color: #f8fafc;
   color: #0f172a;
 }
-/* =========================================
-   CUSTOM MEDICINE DROPDOWN STYLES
-========================================= */
+
 .sehat-dropdown-container {
   position: relative;
   width: 100%;
@@ -643,7 +639,7 @@ body {
   padding: 0;
 }
 
-/* Scrollbar ko thora pyara karne ke liye */
+
 .sehat-dropdown-list::-webkit-scrollbar {
   width: 6px;
 }
@@ -661,7 +657,7 @@ body {
   transition: background-color 0.2s ease;
 }
 
-/* Hover Effect (Jab mouse upar aaye) */
+
 .sehat-dropdown-item:hover {
   background-color: #f8fafc;
   color: #0f172a;
