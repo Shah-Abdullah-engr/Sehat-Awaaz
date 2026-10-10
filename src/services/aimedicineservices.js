@@ -1,6 +1,6 @@
 import { AI_DRUG_DATABASE } from '../data/medicinedatabase';
 
-const GROQ_API_KEY = "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";
+const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
 
 export const fetchMedicineFromAI = async (medicineName) => {
   const cleanKey = (medicineName || '').toLowerCase().trim();
@@ -12,7 +12,7 @@ export const fetchMedicineFromAI = async (medicineName) => {
     return AI_DRUG_DATABASE[cleanKey];
   }
 
-  // 2. LocalStorage Cache Check (0ms)
+
   const cacheKey = `sehat_med_${cleanKey}`;
   const cachedData = localStorage.getItem(cacheKey);
   if (cachedData) {
