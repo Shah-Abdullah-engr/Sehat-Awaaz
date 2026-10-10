@@ -12,7 +12,6 @@ export const fetchMedicineFromAI = async (medicineName) => {
     return AI_DRUG_DATABASE[cleanKey];
   }
 
-
   const cacheKey = `sehat_med_${cleanKey}`;
   const cachedData = localStorage.getItem(cacheKey);
   if (cachedData) {
